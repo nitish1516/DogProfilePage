@@ -17,8 +17,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
 
 
@@ -75,8 +77,7 @@ fun ProfilePage()
                     .constrainAs(cutePuppisDec)
                     {
                         top.linkTo(cityText.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
+                      
                     })
             {
                 ProfileStats("150","Followers")
@@ -109,6 +110,55 @@ fun ProfilePage()
         }
     }
 
+}
+
+ fun portaritConstraint(margin: Dp):ConstraintSet
+{
+    return ConstraintSet{
+
+        val  image=createRefFor("image")
+        val  cutePuppies=createRefFor("cutePuppies")
+        val  cityText=createRefFor("cityText")
+        val  cutePuppisDec=createRefFor("cutePuppisDec")
+        val  buttonFollow=createRefFor("buttonFollow")
+        val  buttonDirectMessge=createRefFor("buttonDirectMessge")
+        constrain(image)
+        {
+            top.linkTo(parent.top) // it is linked at the top of the parent card
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+        }
+        constrain(cutePuppies)
+        {
+            top.linkTo(image.bottom) // it will be under image
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+        }
+        constrain(cityText)
+        {
+            top.linkTo(cutePuppies.bottom)
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+        }
+        constrain(cutePuppisDec)
+        {
+            top.linkTo(cityText.bottom)
+
+        }
+        constrain(buttonFollow)
+        {
+            top.linkTo(cutePuppisDec.bottom,margin =margin)
+            start.linkTo(parent.start)
+            end.linkTo(buttonDirectMessge.start)
+            width= Dimension.wrapContent
+        }
+        constrain(buttonDirectMessge)
+        {
+            top.linkTo(cutePuppisDec.bottom,margin = margin)
+            start.linkTo(buttonFollow.end,margin = 16.dp)
+            end.linkTo(parent.end)
+        }
+    }
 }
 
 @Composable
