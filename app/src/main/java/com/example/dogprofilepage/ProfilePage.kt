@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,80 +34,59 @@ fun ProfilePage()
         .padding(top = 100.dp, bottom = 100.dp, start = 16.dp, end = 16.dp)
         .border(width = 2.dp, color = Color.White, shape = RoundedCornerShape(30.dp))
     ) {
-        /**
-         * Modifier.fillMaxSize take the entire row to fill
-         * Content of our card
-         */
-        ConstraintLayout{
-            val (image,cutePuppies,cityText,cutePuppisDec,buttonFollow,buttonDirectMessge)=createRefs()
-            val guideLine=createGuidelineFromTop(0.1f)
-            Image(painter = painterResource(id = R.drawable.dog_img)
-                ,contentDescription = "Puppies"
-                , modifier = Modifier
+        BoxWithConstraints() {
+            val constarint=if(minWidth<600.dp)
+            {
+                portaritConstraint(16.dp)
+            }
+            else
+            {
+                landscapeConstrain(16.dp)
+            }
+
+        ConstraintLayout(constarint) {
+
+            Image(
+                painter = painterResource(id = R.drawable.dog_img),
+                contentDescription = "Puppies",
+                modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
                     .border(
                         width = 2.dp, color = Color.Blue, shape = CircleShape
-                    ).constrainAs(image) // How something is positioned
-                    {
-                        top.linkTo(guideLine) // it is linked at the top of the parent card
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
+                    )
+                    .layoutId("image"),
+                contentScale = ContentScale.Crop
+            )
+            Text(text = "Cutest puppies", modifier = Modifier.layoutId("cutePuppies"))
+            Text(text = "Kuala Lumpur", modifier = Modifier.layoutId("cityText"))
 
-                    }
-                ,contentScale = ContentScale.Crop)
-            Text(text="Cutest puppies",
-            modifier= Modifier.constrainAs(cutePuppies)
-            {
-                top.linkTo(image.bottom) // it will be under image
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            })
-            Text(text="Kuala Lumpur",
-            modifier = Modifier.constrainAs(cityText)
-            {
-                top.linkTo(cutePuppies.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            })
-
-            Row(horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier= Modifier
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .constrainAs(cutePuppisDec)
-                    {
-                        top.linkTo(cityText.bottom)
-                      
-                    })
+                    .layoutId("cutePuppisDec")
+            )
             {
-                ProfileStats("150","Followers")
-                ProfileStats("100","Following")
-                ProfileStats("30","Post")
+                ProfileStats("150", "Followers")
+                ProfileStats("100", "Following")
+                ProfileStats("30", "Post")
             }
 
-                Button(onClick = { /*TODO*/ },colors = ButtonDefaults.buttonColors(
-                    Color.DarkGray),modifier = Modifier.constrainAs(buttonFollow)
-                {
-                    top.linkTo(cutePuppisDec.bottom,margin = 16.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(buttonDirectMessge.start)
-                    width= Dimension.wrapContent
-                }) {
-                    Text(text = "Follow User",color = Color.White)
+            Button(
+                onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
+                    Color.DarkGray
+                ), modifier = Modifier.layoutId("buttonFollow")
+            ) {
+                Text(text = "Follow User", color = Color.White)
 
-                }
-                Button(onClick = { /*TODO*/ },modifier=Modifier.constrainAs(buttonDirectMessge)
-                {
-                    top.linkTo(cutePuppisDec.bottom,margin = 16.dp)
-                    start.linkTo(buttonFollow.end,margin = 16.dp)
-                    end.linkTo(parent.end)
-                    width= Dimension.wrapContent
-                }) {
-                    Text(text = "Direct Message")
+            }
+            Button(onClick = { /*TODO*/ }, modifier = Modifier.layoutId("buttonDirectMessge")) {
+                Text(text = "Direct Message")
 
-                }
-
+            }
+        }
         }
     }
 
@@ -122,9 +102,10 @@ fun ProfilePage()
         val  cutePuppisDec=createRefFor("cutePuppisDec")
         val  buttonFollow=createRefFor("buttonFollow")
         val  buttonDirectMessge=createRefFor("buttonDirectMessge")
+        val guideline=createGuidelineFromTop(0.1f)
         constrain(image)
         {
-            top.linkTo(parent.top) // it is linked at the top of the parent card
+            top.linkTo(guideline) // it is linked at the top of the parent card
             start.linkTo(parent.start)
             end.linkTo(parent.end)
         }
@@ -161,6 +142,59 @@ fun ProfilePage()
     }
 }
 
+fun landscapeConstrain(margin: Dp):ConstraintSet
+{
+    return ConstraintSet(){
+        val  image=createRefFor("image")
+        val  cutePuppies=createRefFor("cutePuppies")
+        val  cityText=createRefFor("cityText")
+        val  cutePuppisDec=createRefFor("cutePuppisDec")
+        val  buttonFollow=createRefFor("buttonFollow")
+        val  buttonDirectMessge=createRefFor("buttonDirectMessge")
+        val guideline=createGuidelineFromTop(0.1f)
+        constrain(image)
+        {
+            top.linkTo(guideline,margin=margin) // it is linked at the top of the parent card
+            start.linkTo(parent.start,margin = margin)
+
+        }
+        constrain(cutePuppies)
+        {
+            top.linkTo(image.bottom) // it will be under image
+            start.linkTo(parent.start,margin = margin)
+
+        }
+        constrain(cityText)
+        {
+            top.linkTo(cutePuppies.bottom)
+            start.linkTo(cutePuppies.start)
+            end.linkTo(cutePuppies.end)
+
+        }
+        constrain(cutePuppisDec)
+        {
+            top.linkTo(image.top)
+            start.linkTo(image.end,margin = margin)
+            end.linkTo(parent.end)
+
+        }
+        constrain(buttonFollow)
+        {
+            top.linkTo(cutePuppisDec.bottom,margin =margin)
+            start.linkTo(cutePuppisDec.start)
+            end.linkTo(buttonDirectMessge.start)
+            bottom.linkTo(cityText.bottom)
+            width= Dimension.wrapContent
+        }
+        constrain(buttonDirectMessge)
+        {
+            top.linkTo(cutePuppisDec.bottom,margin = margin)
+            start.linkTo(buttonFollow.end,margin = 16.dp)
+            bottom.linkTo(cityText.bottom)
+            end.linkTo(parent.end)
+        }
+    }
+}
 @Composable
 fun ProfileStats(count:String,title:String)
 {
